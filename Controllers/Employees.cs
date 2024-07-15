@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using WebAPI_CRUD.Data;
 
@@ -6,9 +8,10 @@ namespace WebAPI_CRUD.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class Employees : ControllerBase
     {
-        private EmployeeRepository _employeeRepository;
+        private readonly EmployeeRepository _employeeRepository;
         public Employees(EmployeeRepository employeeRepository)
         {
             _employeeRepository = employeeRepository;
@@ -22,6 +25,7 @@ namespace WebAPI_CRUD.Controllers
         }
 
         [HttpGet]
+       
         public async Task<ActionResult> GetEmployee()
         {
             var employee = await _employeeRepository.GetAllEmployeeList();
@@ -36,10 +40,10 @@ namespace WebAPI_CRUD.Controllers
             return Ok(employee);
         }
 
-        [HttpPut("{Id}")]
-        public async Task<ActionResult> UpdateEmployee([FromRoute]int Id,[FromBody] Employee? model)
+        [HttpPut()]
+        public async Task<ActionResult> UpdateEmployee( [FromBody] Employee? model)
         {
-             await _employeeRepository.UpdateEmployee(Id, model);
+            await _employeeRepository.UpdateEmployee(model);
             return Ok();
         }
 

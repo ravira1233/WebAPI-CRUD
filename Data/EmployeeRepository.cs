@@ -26,9 +26,9 @@ namespace WebAPI_CRUD.Data
             return await _context.employees.FindAsync(ID);
         }
 
-        public async Task UpdateEmployee(int Id,Employee? model)
+        public async Task UpdateEmployee(Employee? model)
         {
-            var employee = await _context.employees.FindAsync(Id);
+            var employee = await _context.employees.FindAsync(model.Id);
             if(employee ==null)
             {
                 throw new Exception("Employee is empty");
@@ -37,7 +37,7 @@ namespace WebAPI_CRUD.Data
             employee.Email = model.Email;
             employee.Phone = model.Phone;
             employee.salary = model.salary;
-            employee.age = model.age;
+            employee.Age = model.Age;
            await _context.SaveChangesAsync();
         }
 
@@ -48,8 +48,13 @@ namespace WebAPI_CRUD.Data
             {
                 throw new Exception("Employee is empty");
             }
-           _context.employees.Remove(employee);
+            _context.employees.Remove(employee);
             await _context.SaveChangesAsync();
+        }
+
+        public async Task<Employee> GetEmployeeByEmail(string Email)
+        {
+            return await _context.employees.Where(x => x.Email == Email).FirstOrDefaultAsync();
         }
     }
 }
