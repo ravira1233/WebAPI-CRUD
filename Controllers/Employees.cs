@@ -1,7 +1,11 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using LazyCache;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.Extensions.Caching.Memory;
+using WebAPI_CRUD.Cache;
 using WebAPI_CRUD.Data;
 
 namespace WebAPI_CRUD.Controllers
@@ -12,9 +16,12 @@ namespace WebAPI_CRUD.Controllers
     public class Employees : ControllerBase
     {
         private readonly EmployeeRepository _employeeRepository;
-        public Employees(EmployeeRepository employeeRepository)
+        private readonly ICacheProvider _cacheProvider;
+   
+        public Employees(EmployeeRepository employeeRepository, ICacheProvider cacheProvider)
         {
             _employeeRepository = employeeRepository;
+            _cacheProvider = cacheProvider;
         }
 
         [HttpPost]
@@ -25,10 +32,21 @@ namespace WebAPI_CRUD.Controllers
         }
 
         [HttpGet]
-       
         public async Task<ActionResult> GetEmployee()
         {
-            var employee = await _employeeRepository.GetAllEmployeeList();
+            if (!_cacheProvider.TryGetValue(CacheKey.employeeKey, out List<Employee> employee))
+            {
+                employee = await _employeeRepository.GetAllEmployeeList();
+                var memoryoption = new MemoryCacheEntryOptions
+                {
+                    AbsoluteExpiration = DateTimeOffset.Now.AddMinutes(30),
+                    SlidingExpiration= TimeSpan.FromMinutes(30),
+                    Size=1024
+                };
+                _cacheProvider.Set(CacheKey.employeeKey, employee, memoryoption);
+
+            }
+
             return Ok(employee);
         }
 
