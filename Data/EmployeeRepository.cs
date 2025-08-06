@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.EntityFrameworkCore;
 
 namespace WebAPI_CRUD.Data
 {
@@ -31,7 +32,8 @@ namespace WebAPI_CRUD.Data
             var employee = await _context.employees.FindAsync(model.Id);
             if(employee ==null)
             {
-                throw new Exception("Employee is empty");
+               
+                throw new System.Exception("Employee is empty");
             }
             employee.Name = model.Name;
             employee.Email = model.Email;
@@ -46,7 +48,7 @@ namespace WebAPI_CRUD.Data
             var employee = await _context.employees.FindAsync(Id);
             if (employee == null)
             {
-                throw new Exception("Employee is empty");
+                throw new System.Exception("Employee is empty");
             }
             _context.employees.Remove(employee);
             await _context.SaveChangesAsync();

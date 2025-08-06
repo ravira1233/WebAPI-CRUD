@@ -41,7 +41,9 @@ builder.Services.AddSwaggerGen(c =>
             new string[] {}
         }
     });
-}); ;
+}); 
+builder.Services.AddMemoryCache();
+builder.Services.AddLazyCache();
 builder.Services.AddScoped<EmployeeRepository>();
 var key = builder.Configuration.GetSection("JWT:Key").Get<string>();
 builder.Services.Configure<JWTOption>(builder.Configuration.GetSection("JWT"));
